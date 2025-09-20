@@ -1,0 +1,9 @@
+@startuml  
+actor User  
+participant "Order Service" as OrderService  
+participant "Payment Service" as PaymentService  
+User -> OrderService: Place Order  
+OrderService -> PaymentService: Verify Payment  
+PaymentService -> OrderService: Payment Approved  
+OrderService -> User: Order Confirmation  
+@enduml  

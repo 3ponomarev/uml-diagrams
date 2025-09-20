@@ -1,0 +1,16 @@
+@startuml  
+start  
+:Enter email;  
+->  
+:Enter password;  
+->  
+:Click login;  
+if (Valid credentials?) then (yes)  
+->  
+:Redirect to dashboard;  
+else  
+->  
+:Show error;  
+endif  
+end  
+@enduml  
