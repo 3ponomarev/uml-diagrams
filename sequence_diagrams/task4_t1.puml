@@ -1,0 +1,71 @@
+@startuml task4_t1
+actor Manager as M
+actor Customer as C
+participant "Web UI" as UI
+participant "Order Controller" as OC
+participant "Payment Service" as PS
+database "Data Base" as DB
+participant "Notification Service" as NS
+
+activate C
+group "1. Оформление заказа"
+    C -> UI : CreateOrder(OrderDetails)
+    activate UI
+    UI -> OC : ProcessOrder(OrderDetails)
+    activate OC
+    OC -> DB : SaveOrder(OrderDetails)
+    activate DB
+    DB --> OC : SaveOrderResult
+    deactivate DB
+    note right DB: Заказ сохраняется в статусе "Ожидание  оплаты"
+end group
+
+group "2. Оплата"
+    OC -> PS : ProcessPayment(PaymentDetails)
+    activate PS
+    alt Успешная оплата
+        PS [#green]--> OC : PaymentSuccessful(PaymentConfirmation)
+        OC [#LightBlue]--> NS : SendOrderNotification(OrderId)
+        activate NS
+    else Ошибка платежа
+        PS [#red]--> OC : PaymentFailed(ErrorMessage)
+        note right OC: Заказ сохраняется, как предварительный
+    end alt
+    deactivate PS
+end group
+
+group "3. Подтверждение"
+    OC --> UI : OrderConfirmation(ConfirmationDetails)
+    deactivate OC
+    UI --> C : DisplayOrderConfirmation(ConfirmationDetails)
+    deactivate UI
+end group
+
+group "4. Редактирование корзины"
+    C -> UI : EditCart(Action, ItemDetails)
+    activate UI
+    note right : Добавление/удаление/изменение кол-ва
+    UI -> OC : UpdateCart(Action, ItemDetails)
+    activate OC
+    OC ->DB : UpdateCartDB(CartDetails)
+    activate DB
+    DB --> OC : UpdateCartConfirmation
+    deactivate DB
+    OC --> UI : UpdateCartConfirmation(ConfirmationDetails)
+    deactivate OC
+    UI --> C : DisplayUpdateCartConfirmation(ConfirmationDetails)
+    deactivate UI
+    deactivate C
+end group
+
+group "5. Уведомление менеджера"
+    NS -> UI : ManagerNotification(OrderId, OrderStatus)
+    deactivate NS
+    activate UI
+    UI -> M : DisplayManagerNotification(OrderId, OrderStatus)
+    deactivate UI
+    activate M
+    deactivate M
+end group
+
+@enduml
