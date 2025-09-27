@@ -1,0 +1,78 @@
+@startuml task5_t1
+abstract class Payment {
+    #amount : double
+    #paymentDate : Date
+    #transactionId : String
+    
+    <> processPayment()
+    +getAmount() : double
+    +getPaymentDate() : Date
+    +getTransactionId() : String
+    +setAmount(amount : double)
+    +setPaymentDate(date : Date)
+    +setTransactionId(id : String)
+}
+
+class CashPayment {
+    #cashProvided : double
+    
+    +processPayment()
+    +calculateChange() : double
+    +getCashProvided() : double
+    +setCashProvided(amount : double)
+}
+
+class CardPayment {
+    #cardNumber : String
+    #cardHolderName : String
+    #expiryDate : Date
+    
+    +processPayment()
+    +validateCard() : boolean
+    +getCardNumber() : String
+    +getCardHolderName() : String
+    +getExpiryDate() : Date
+    +setCardNumber(number : String)
+    +setCardHolderName(name : String)
+    +setExpiryDate(date : Date)
+}
+
+class PaymentManager  {
+ +payments : List
+ 
+ +registerPayment(payment : double) boolean
+ +processAllPayments()
+}
+
+interface PaymentProcessor  {
++processPayment(payment : double) boolean
+
+}
+
+Payment <|.. CashPayment : наследование
+Payment <|.. CardPayment : наследование
+PaymentManager o-- Payment : агрегация
+PaymentManager ..|> PaymentProcessor : имплементация
+
+PaymentManager ..> Payment : использует
+CashPayment ..> Payment : реализует
+CardPayment ..> Payment : реализует
+
+note left of Payment
+ Абстрактный класс
+ Определяет контракт
+ для всех платежей
+end note
+
+note right of PaymentProcessor
+ Интерфейс для
+ обработки платежей
+end note
+
+note right of PaymentManager
+ Реализует интерфейс
+ и управляет всеми
+ типами платежей
+end note
+
+@enduml
