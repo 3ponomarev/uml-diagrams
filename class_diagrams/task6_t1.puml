@@ -1,0 +1,136 @@
+@startuml task6_t1
+
+class Customer {
+    -customerId : Integer
+    -name : String
+    -orders : List<Order>
+}
+
+class Order {
+    -orderId : Integer
+    -orderDate : Date
+    -items : List<Item> 
+
+    +calculateTotal() : Double
+}
+
+class Item {
+    -itemId : Integer
+    -itemName : String
+    -price : Double
+}
+
+class Employee {
+    -empId : Integer
+    -empName : String
+    -department : <<reference>> Department
+
+    +getEmployeeInfo() : String
+}
+
+class Manager {
+    -bonus : Double
+
+    +getManagerInfo() : String
+}
+
+class Department {
+    -deptId : Integer
+    -deptName : String
+
+    +getDepartmentInfo() : String
+}
+
+class House {
+    -houseId : Integer
+    -address : String
+}
+
+class Room {
+    -roomId : Integer
+    -roomName : String
+}
+
+class User {
+    -userId : Integer
+    -userName : String
+    -profile : <<reference>> Profile
+    
+    +getUserDetails() : String
+}
+
+class Profile {
+    -profileId : Integer
+    -bio : String
+    -avatarUrl : String
+
+    +getProfileSummary() : String
+}
+
+class Student {
+    -studentId : Integer
+    -name : String
+}
+
+class Enrollment {
+    -enrollmentDate : Date
+    -grade : String
+
+}
+
+class Course {
+    -courseId : Integer
+    -courseName : String
+    -modules : List<Module> 
+}
+
+class Module {
+    -moduleId : Integer
+    -moduleName : String
+    -materials : List<Material> 
+}
+
+class Material {
+    +materialId : Integer
+    +name : String
+}
+
+class Instructor {
+    +speciality : string
+    +Courses : List<Courses>
+}
+
+class PaymentProcessor {
+    +processPayment() : Boolean
+}
+
+Customer --> User : клиент имеет учетную запись (ассоциация, связь между модулями)
+Customer "1" -- "0..*" Order : клиент размещает заказы (ассоциация, 0..*)
+Order "1" o-- "1..*" Item : заказ содержит элементы (композиция, при удалении заказа удаляются и элементы)
+Order ..> PaymentProcessor : заказ использует процессор платежей (зависимость)
+Customer --> Employee : клиенту назначается сотрудник
+Order "0..1" --> "1" Employee : заказ обрабатывается сотрудником (ассоциация, 0..1)
+Employee "1" --> "0..1" House : сотрудник владеет домом (ассоциация, опциональная 0..1)
+House "1" *-- "1..*" Room : дом состоит из комнат (композиция, при удалении дома, удаляются и комнаты) 
+Employee "1" --> "1" Department : сотрудник принадлежит отделу (ассоциация, обязательная связь)
+Employee <|-- Manager : наследование (менеджер - подтип сотрудника)
+Manager "1" --> "1" Department : менеджер управляет отделом (ассоциация, роль)
+User "1" --> "0..1" Profile : содержит профиль (ассоциация, 0..1)
+User  <|-- Student : наследование (студент - подтип пользователя)
+User ..> PaymentProcessor : пользователь инициирует платеж (зависимость)
+Student "1" -- "0..*" Enrollment : студент зачисляется на курсы (ассоциация, 0.. *)
+Enrollment "1" -- "1" Course : зачисление относится к конкретному курсу (ассоциация, 1)
+Course "1" *-- "1..*" Module : курс содержит модули (композиция, 1..*)
+Module "1" *-- "1..*" Material : модуль содержит материалы (композиция, 1..*)
+Student "0..*" -- "0..*" Course : студенты изучают курсы (ассоциация, 0..*)
+User  <|-- Instructor : наследование (преподаватель - подтип пользователя)
+Instructor "1..*" -- "0..*" Material :  преподаватели создают материалы (ассоциация, 0..*)
+Course --> Department : курс предложен отделом (ассоциация, связь)
+
+note left of Enrollment
+ассоциативный 
+класс 
+(зачисление)
+end note
+
+@enduml
