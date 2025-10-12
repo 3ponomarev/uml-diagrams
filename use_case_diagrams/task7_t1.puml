@@ -1,0 +1,37 @@
+@startuml task7_t1
+left to right direction
+
+actor "Клиент" as Client
+actor "Сотрудник банка" as Bank_Employee
+actor "Кредитный менеджер" as Credit_Manager
+actor "Служба безопасности" as Security
+actor "Бюро кредитных историй (БКИ)" as CHB
+
+rectangle "Рассмотрение кредитной заявки" {
+(UC1 Подать заявку) as UC1
+(UC2 Рассмотреть заявку) as UC2
+(UC3 Проверить кредитную историю Клиента) as UC3
+(UC4 Одобрить заявку) as UC4
+(UC5 Отклонить заявку) as UC5
+(UC6 Подписать кредитный договор) as UC6
+(UC7 Выдать\получить кредитные средства) as UC7
+}
+
+Bank_Employee <|-- Credit_Manager
+Bank_Employee <|-- Security
+Client --> UC1
+Credit_Manager --> UC2
+UC1 .> UC2 : include
+UC2 .> UC3 : include
+Security --> UC3
+UC3 --> CHB : Запрос кредитной истории
+Credit_Manager --> UC4 :  include <<если кредитная история хорошая>>
+UC2 <.. UC5 : extends <<если кредитная история плохая>>
+UC4 .> UC6 : include
+Credit_Manager --> UC6
+Client --> UC6
+UC6 .> UC7 : include
+Credit_Manager --> UC7 
+Client --> UC7 
+
+@enduml
