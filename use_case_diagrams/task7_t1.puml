@@ -33,5 +33,4 @@ Client --> UC6
 UC6 .> UC7 : include
 Credit_Manager --> UC7 
 Client --> UC7 
-
 @enduml
