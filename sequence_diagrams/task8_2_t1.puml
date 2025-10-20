@@ -1,0 +1,56 @@
+@startuml task8_2_t1
+autonumber
+actor "Клиент(C)" as C
+participant "Мобильное приложение(App)" as App
+participant "Бэкенд(BE)" as BE
+participant "База данных(DB)" as DB
+participant "СМС-сервис(SMS)" as SMS
+
+activate C
+C -> App : Ввести реквизиты перевода
+
+activate App
+App -> BE : Проверить баланс
+activate BE
+BE -> DB : Запросить баланс Клиента
+activate DB
+DB --> BE : Вернуть баланс Клиента
+    
+alt Сумма <= балансу Клиента
+    BE -> DB : Запросить комиссию банка(%)
+    DB --> BE : Вернуть комиссию банка(%)
+    deactivate DB
+    BE -> BE : Рассчитать стоимость перевода(сумма перевода * на комиссию банка(%))
+    BE --> App : Отправить результат расчета стоимости перевода
+    else Сумма > баланса Клиента
+    BE --> App : Недостаточно средств
+    deactivate BE
+    end
+App --> C : Отобразить результат расчета стоимости перевода
+deactivate App
+
+opt Средств достаточно и Клиент согласен с комиссией
+    C -> App : Согласиться с комиссией
+    activate App
+    App -> SMS : Отправить проверочный код  
+    activate SMS
+    SMS --> C : Проверочный код
+    deactivate SMS
+    C -> App : Ввести проверочный код
+    App -> BE : Инициировать транзакцию
+    activate BE
+    BE -> BE : Перевести деньги Получателю 
+    BE ->> DB : Записать транзакцию(асинхронно)
+    activate DB
+    DB --> BE : Вернуть результат записи транзакции     
+    BE -> DB : Изменить баланс Клиента
+    DB --> BE : Вернуть результат изменения баланса
+    deactivate DB
+    BE --> App : Вернуть результат транзакции и текущий баланс
+    deactivate BE
+end
+
+App --> C : Отобразить результат перевода
+deactivate App
+deactivate C
+@enduml
